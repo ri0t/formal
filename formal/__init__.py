@@ -24,11 +24,14 @@
 #
 
 """
+This is the core Formal module containing the model factory and some generic
+exports.
+
 Changes notice
 ==============
 
 This file has been changed by the Hackerfleet Community and this notice has
-been added in accordance to the Apache License 2.0
+exports.
 
 """
 
