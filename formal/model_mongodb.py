@@ -86,8 +86,6 @@ class Model(ModelBase):
 
         result = copy(self._fields)
 
-        result["id"] = self._schema["id"]
-
         if "_id" in result:
             result["_id"] = str(result["_id"])
 
