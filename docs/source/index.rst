@@ -2,6 +2,12 @@
 Formal Documentation
 ====================
 
+.. image:: _static/logo.png
+    :width: 350px
+    :align: right
+    :height: 350px
+    :alt: Formal Logo
+
 :Version: |version|
 :Release: |release|
 :Date: |today|
@@ -33,9 +39,9 @@ Developer Documentation
 .. toctree::
     :maxdepth: 1
 
+    start/index
     dev/index
-    #dev/man/index
-    #dev/api/index
+    faq
     changes
     roadmap
     contributors

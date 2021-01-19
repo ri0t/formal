@@ -10,7 +10,7 @@ Here is a summary of the steps to your own development environment:
 
 1. `Fork Formal <https://github.com/isomeric/formal#fork-destination-box>`_
    (*if you haven't done so already*)
-2. Clone your forked repository using `Git`_
+2. Clone your forked repository using `Git`
 3. Create a virtual environment
 4. Install formal
 5. Run tests
