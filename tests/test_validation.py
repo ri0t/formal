@@ -134,7 +134,7 @@ class TestValidation(unittest.TestCase):
             "properties": {
                 "_id": {
                     "type": "string",
-                    "pattern": "^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)",
+                    "pattern": r"^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)",
                     "additionalProperties": False,
                 }
             },
