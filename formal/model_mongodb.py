@@ -33,14 +33,17 @@ been added in accordance to the Apache License 2.0
 
 """
 
+import json
+from deepdiff import DeepDiff, Delta
 from bson import ObjectId
 from pymongo import DESCENDING
+from datetime import datetime
 
 from .model_base import ModelBase
 import formal.database
 from .exceptions import InvalidReloadException
 
-from copy import copy
+from copy import copy, deepcopy
 
 
 class Model(ModelBase):
@@ -73,6 +76,33 @@ class Model(ModelBase):
             assert result.acknowledged is True
             assert result.inserted_id is not None
             self._fields["_id"] = result.inserted_id
+
+        if self._history:
+            field_copy = deepcopy(self._fields)
+            del field_copy['_id']
+            diff = Delta(DeepDiff(self._last_state, field_copy), serializer=json.dumps)
+
+            changeset = {
+                'id': self._fields['_id'],
+                't': datetime.now(),
+                'c': diff.dumps()
+            }
+            self.history_collection().insert(changeset)
+
+            self._last_state = field_copy
+
+    def get_historical(self, start, end):
+        changes = self.history_collection().find({
+            'id': self._fields['_id'],
+            't': {'$gte': start, '$lt': end}
+        })
+
+        historic_object = {}
+
+        for item in sorted(changes, key=lambda x: x['t']):
+            historic_object += Delta(item['c'], deserializer=json.loads)
+
+        return historic_object
 
     def delete(self):
         """ Removes an object from the database. """
@@ -218,4 +248,13 @@ class Model(ModelBase):
         map-reduce. """
         return formal.database.get_collection(
             collection=cls.collection_name(), database=cls.database_name()
+        )
+
+    @classmethod
+    def history_collection(cls):
+        """ Get the pymongo collection object for this model. Useful for
+        features not supported by formal like aggregate queries and
+        map-reduce. """
+        return formal.database.get_collection(
+            collection=cls.collection_name() + "_history", database=cls.database_name()
         )

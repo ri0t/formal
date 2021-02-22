@@ -85,6 +85,7 @@ class ModelBase(object):
     def __init__(self, original_fields=None, from_find=False, validation=True, *args,
                  **kwargs):
         """ Creates an instance of the object."""
+
         if original_fields is None:
             original_fields = {}
 
@@ -113,6 +114,13 @@ class ModelBase(object):
             self.validate()
         if has_id:
             self._fields["_id"] = original_fields["_id"]
+
+        self._history = self._schema.get("history", False)
+
+        if self._history:
+            self._last_state = deepcopy(self._fields)
+        else:
+            self._last_state = {}
 
     def get(self, field, default=None):
         """ Get a field if it exists, otherwise return the default. """

@@ -36,6 +36,10 @@ import unittest
 
 import formal
 
+from datetime import datetime, timedelta
+from time import sleep
+from copy import deepcopy
+
 
 class TestCreating(unittest.TestCase):
     def setUp(self):
@@ -82,3 +86,60 @@ class TestCreating(unittest.TestCase):
         self.assertEqual(2, len(canada.languages))
         self.assertTrue("english" in canada.languages)
         self.assertTrue("french" in canada.languages)
+
+    def testHistoryCreate(self):
+        canada = self.Country(
+            {"name": "Canada", "abbreviation": "CA"}
+        )
+
+        canada._history = True
+        canada.save()
+        canada_id = canada._fields["_id"]
+
+        history_collection = canada.history_collection
+
+        assert history_collection is not None
+
+        history = history_collection().find_one({'id': canada_id})
+        assert history is not None
+
+        assert isinstance(history['t'], datetime)
+        assert isinstance(history['c'], str)
+        assert history['id'] == canada_id
+
+        canada.languages = ["french"]
+        canada.save()
+
+        canada.languages.append("english")
+        canada.save()
+
+        for history in history_collection().find({'id': canada_id}):
+
+            assert isinstance(history['t'], datetime)
+            assert isinstance(history['c'], str)
+            assert history['id'] == canada_id
+
+    def testHistoryRecreate(self):
+        canada = self.Country(
+            {"name": "Canada", "abbreviation": "CA"}
+        )
+
+        begin = datetime.now()
+
+        canada._history = True
+        canada.save()
+
+        canada.languages = ['english']
+        canada.save()
+        sleep(0.2)
+
+        canada.languages.append('french')
+        canada.save()
+        sleep(0.2)
+
+        rebuilt_canada = canada.get_historical(begin, datetime.now())
+
+        fields = deepcopy(canada._fields)
+        del fields['_id']
+
+        assert rebuilt_canada == fields

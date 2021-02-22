@@ -1,4 +1,4 @@
 pymongo>=3.2
 jsonschema>=3.0.2
-deepdiff>=3.2.1
+deepdiff>=5.2.2
 sqlalchemy>=1.2.14
