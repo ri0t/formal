@@ -87,8 +87,7 @@ class Model(ModelBase):
                 't': datetime.now(),
                 'c': diff.dumps()
             }
-            self.history_collection().insert(changeset)
-
+            self.history_collection().insert_one(changeset)
             self._last_state = field_copy
 
     def get_historical(self, start, end):

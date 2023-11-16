@@ -101,7 +101,8 @@ class Model(object):
 
         # print(**self._fields)
         insert = self._table.insert().values(**self._fields)
-        result = self._engine.execute(insert)
+        with self._engine.connect() as conn:
+            result = conn.execute(insert)
         return result.inserted_primary_key
 
     def delete(self):
@@ -121,7 +122,8 @@ class Model(object):
         )
 
         delete = sql.text(query)
-        result = self._engine.execute(delete)
+        with self._engine.connect() as conn:
+            result = conn.execute(delete)
         return result
 
     def serializablefields(self):
@@ -268,7 +270,8 @@ class Model(object):
             query += " LIMIT %i" % limit
 
         find = sql.text(query)
-        result = cls._engine.execute(find)
+        with cls._engine.connect() as conn:
+            result = conn.execute(find)
         return result
 
     @classmethod
@@ -289,7 +292,8 @@ class Model(object):
         name = cls._schema["name"]
 
         query = "SELECT COUNT(*) FROM %s" % name
-        proxy = cls._engine.execute(query).scalar()
+        with cls._engine.connect() as conn:
+            proxy = conn.execute(query).scalar()
 
         return int(proxy)
 
@@ -300,7 +304,8 @@ class Model(object):
         query = "DELETE FROM {table_name}".format(**{"table_name": cls._schema["name"]})
 
         clear = sql.text(query)
-        result = cls._engine.execute(clear)
+        with cls._engine.connect() as conn:
+            result = conn.execute(clear)
         return result
 
     @classmethod
